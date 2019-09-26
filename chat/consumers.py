@@ -12,8 +12,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+        print('>>>>cn',self.channel_name)
+        print('>>>>rgn',self.room_group_name)
+        print('>>>>rn',self.room_name)
+        print('>>>>user',self.scope['user'])
 
         await self.accept()
+        # await self.send({
+        #         "type" : "websocket.send",
+        #         "text" : "Hello World!"
+        # })
 
     async def disconnect(self, close_code):
         # Leave room group
