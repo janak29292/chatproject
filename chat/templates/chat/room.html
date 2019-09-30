@@ -6,7 +6,16 @@
     <title>Chat Room</title>
 </head>
 <body>
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
+  <select id="chat_room">
+    <option value="g1">Group1</option>
+    <option value="g2">Group2</option>
+    <option value="g3">Group3</option>
+    <option value="g4">Group4</option>
+  </select>
+    <textarea id="chat-log-g1" cols="100" rows="2"></textarea><br/>
+    <textarea id="chat-log-g2" cols="100" rows="2"></textarea><br/>
+    <textarea id="chat-log-g3" cols="100" rows="2"></textarea><br/>
+    <textarea id="chat-log-g4" cols="100" rows="2"></textarea><br/>
     <input id="chat-message-input" type="text" size="100"/><br/>
     <input id="chat-message-submit" type="button" value="Send"/>
 </body>
@@ -14,16 +23,19 @@
 
 </script>
 <script>
-    var roomName = {{ room_name_json }};
+    // var roomName = {{ room_name_json }};
 
     var chatSocket = new ReconnectingWebSocket(
         'ws://' + window.location.host +
-        '/ws/chat/' + roomName + '/');
+        '/ws/chat/');
 
     chatSocket.onmessage = function(e) {
+      console.log(e);
         var data = JSON.parse(e.data);
         var message = data['message'];
-        document.querySelector('#chat-log').value += (message + '\n');
+        var room = data['room'];
+        console.log('>>>>>>>>>',message, room);
+        document.querySelector('#chat-log-'+ room).value += (message + '\n');
     };
 
     chatSocket.onclose = function(e) {
@@ -39,8 +51,11 @@
 
     document.querySelector('#chat-message-submit').onclick = function(e) {
         var messageInputDom = document.querySelector('#chat-message-input');
+        var messageRoomDom = document.querySelector('#chat_room');
         var message = messageInputDom.value;
+        var room = messageRoomDom.value;
         chatSocket.send(JSON.stringify({
+            'room': room,
             'message': message
         }));
 
